@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kaka & Pipi Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 760px;
+      margin: 40px auto;
+      padding: 0 16px;
+      background: #f7f7fb;
+      color: #222;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+    h1, h2 {
+      margin-top: 0;
+    }
+    .buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 16px 0;
+    }
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .kaka { background: #8b5e3c; color: white; }
+    .pipi { background: #4a90e2; color: white; }
+    .clear { background: #ddd; }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin-top: 6px;
+      margin-bottom: 14px;
+      box-sizing: border-box;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .tag {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: white;
+      margin-right: 8px;
+    }
+    .tag.kaka { background: #8b5e3c; }
+    .tag.pipi { background: #4a90e2; }
+    .small { color: #666; font-size: 14px; }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .row > div { flex: 1; min-width: 220px; }
+    .delete-btn {
+      background: #f2f2f2;
+      padding: 8px 10px;
+      border-radius: 8px;
+    }
+    .user-card {
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 12px;
+      flex: 1;
+      min-width: 240px;
+      background: #fafafa;
+    }
+    .user-name {
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .tag.user {
+      background: #555;
+      margin-right: 6px;
+    }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .calendar-title {
+      font-weight: 700;
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(80px, 1fr));
+      gap: 8px;
+    }
+    .dow {
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+      font-weight: 700;
+      padding: 4px 0;
+    }
+    .day-cell {
+      min-height: 84px;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      padding: 6px;
+      background: #fff;
+      font-size: 12px;
+    }
+    .day-num {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .muted-cell {
+      background: #f8f8f8;
+      color: #aaa;
+    }
+    .day-stat {
+      line-height: 1.25;
+      color: #444;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Kaka & Pipi Tracker</h1>
+    <p>Two users can track together and see shared records. Data is saved in your browser.</p>
+    <div class="row">
+      <div class="user-card">
+        <div class="user-name">Jingyi</div>
+        <div class="buttons">
+          <button class="kaka" onclick="quickAdd('Jingyi', 'kaka')">Jingyi Kaka 💩</button>
+          <button class="pipi" onclick="quickAdd('Jingyi', 'pipi')">Jingyi Pipi 💧</button>
+        </div>
+      </div>
+      <div class="user-card">
+        <div class="user-name">Matteo</div>
+        <div class="buttons">
+          <button class="kaka" onclick="quickAdd('Matteo', 'kaka')">Matteo Kaka 💩</button>
+          <button class="pipi" onclick="quickAdd('Matteo', 'pipi')">Matteo Pipi 💧</button>
+        </div>
+      </div>
+    </div>
+    <div class="buttons">
+      <button class="clear" onclick="clearAll()">Clear All</button>
+    </div>
+    <div id="summary" class="small"></div>
+  </div>
+
+  <div class="card">
+    <h2>Add Detailed Record</h2>
+    <label>User</label>
+    <select id="user">
+      <option value="Jingyi">Jingyi</option>
+      <option value="Matteo">Matteo</option>
+    </select>
+
+    <label>Type</label>
+    <select id="type">
+      <option value="kaka">Kaka</option>
+      <option value="pipi">Pipi</option>
+    </select>
+
+    <div class="row">
+      <div>
+        <label>Date</label>
+        <input type="date" id="date" />
+      </div>
+      <div>
+        <label>Time</label>
+        <input type="time" id="time" />
+      </div>
+    </div>
+
+    <label>Notes</label>
+    <textarea id="notes" rows="3" placeholder="Optional notes..."></textarea>
+
+    <button onclick="addDetailed()">Add Record</button>
+  </div>
+
+  <div class="card">
+    <h2>History</h2>
+    <ul id="list"></ul>
+  </div>
+
+  <div class="card">
+    <h2>Calendar (Daily Counts)</h2>
+    <div class="calendar-header">
+      <button class="clear" onclick="changeMonth(-1)">Previous</button>
+      <div id="calendarTitle" class="calendar-title"></div>
+      <button class="clear" onclick="changeMonth(1)">Next</button>
+    </div>
+    <div id="calendar" class="calendar-grid"></div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'kaka-pipi-records';
+    const USERS = ['Jingyi', 'Matteo'];
+    let calendarMonth = new Date();
+    calendarMonth.setDate(1);
+
+    function getRecords() {
+      const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      return records.map((record) => ({
+        user: USERS.includes(record.user) ? record.user : 'Jingyi',
+        ...record
+      }));
+    }
+
+    function saveRecords(records) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+
+    function nowParts() {
+      const now = new Date();
+      const date = now.toISOString().slice(0, 10);
+      const time = now.toTimeString().slice(0, 5);
+      return { date, time };
+    }
+
+    function quickAdd(user, type) {
+      const { date, time } = nowParts();
+      const records = getRecords();
+      records.unshift({ id: crypto.randomUUID(), user, type, date, time, notes: '' });
+      saveRecords(records);
+      render();
+    }
+
+    function addDetailed() {
+      const user = document.getElementById('user').value;
+      const type = document.getElementById('type').value;
+      const date = document.getElementById('date').value;
+      const time = document.getElementById('time').value;
+      const notes = document.getElementById('notes').value.trim();
+
+      if (!date || !time) {
+        alert('Please choose both date and time.');
+        return;
+      }
+
+      const records = getRecords();
+      records.unshift({ id: crypto.randomUUID(), user, type, date, time, notes });
+      saveRecords(records);
+
+      document.getElementById('notes').value = '';
+      render();
+    }
+
+    function deleteRecord(id) {
+      const records = getRecords().filter((r) => r.id !== id);
+      saveRecords(records);
+      render();
+    }
+
+    function clearAll() {
+      if (!confirm('Delete all records?')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+    }
+
+    function renderSummary(records) {
+      const today = new Date().toISOString().slice(0, 10);
+      const todayRecords = records.filter((r) => r.date === today);
+      const lines = USERS.map((user) => {
+        const userToday = todayRecords.filter((r) => r.user === user);
+        const kakaCount = userToday.filter((r) => r.type === 'kaka').length;
+        const pipiCount = userToday.filter((r) => r.type === 'pipi').length;
+        return `${user}: ${kakaCount} kaka, ${pipiCount} pipi`;
+      });
+      lines.push(`All records: ${records.length}`);
+      document.getElementById('summary').textContent = lines.join(' | ');
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function renderList(records) {
+      const list = document.getElementById('list');
+      list.innerHTML = '';
+
+      if (records.length === 0) {
+        list.innerHTML = '<li>No records yet.</li>';
+        return;
+      }
+
+      for (const record of records) {
+        const li = document.createElement('li');
+        const safeNotes = record.notes ? escapeHtml(record.notes) : '';
+        li.innerHTML = `
+          <div>
+            <span class="tag user">${record.user}</span>
+            <span class="tag ${record.type}">${record.type}</span>
+            <strong>${record.date}</strong> ${record.time}
+            ${safeNotes ? `<div class="small">${safeNotes}</div>` : ''}
+          </div>
+          <button class="delete-btn" onclick="deleteRecord('${record.id}')">Delete</button>
+        `;
+        list.appendChild(li);
+      }
+    }
+
+    function getDailyCount(records, dateKey, user, type) {
+      return records.filter((r) => r.date === dateKey && r.user === user && r.type === type).length;
+    }
+
+    function renderCalendar(records) {
+      const grid = document.getElementById('calendar');
+      const title = document.getElementById('calendarTitle');
+      grid.innerHTML = '';
+
+      const year = calendarMonth.getFullYear();
+      const month = calendarMonth.getMonth();
+      title.textContent = calendarMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      for (const dayName of dayNames) {
+        const dow = document.createElement('div');
+        dow.className = 'dow';
+        dow.textContent = dayName;
+        grid.appendChild(dow);
+      }
+
+      const firstDay = new Date(year, month, 1);
+      const startWeekday = firstDay.getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      for (let i = 0; i < startWeekday; i += 1) {
+        const empty = document.createElement('div');
+        empty.className = 'day-cell muted-cell';
+        grid.appendChild(empty);
+      }
+
+      for (let day = 1; day <= daysInMonth; day += 1) {
+        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const jingyiK = getDailyCount(records, dateKey, 'Jingyi', 'kaka');
+        const jingyiP = getDailyCount(records, dateKey, 'Jingyi', 'pipi');
+        const matteoK = getDailyCount(records, dateKey, 'Matteo', 'kaka');
+        const matteoP = getDailyCount(records, dateKey, 'Matteo', 'pipi');
+        const totalK = jingyiK + matteoK;
+        const totalP = jingyiP + matteoP;
+
+        const cell = document.createElement('div');
+        cell.className = 'day-cell';
+        cell.innerHTML = `
+          <div class="day-num">${day}</div>
+          <div class="day-stat">J: K${jingyiK} / P${jingyiP}</div>
+          <div class="day-stat">M: K${matteoK} / P${matteoP}</div>
+          <div class="day-stat"><strong>All:</strong> K${totalK} / P${totalP}</div>
+        `;
+        grid.appendChild(cell);
+      }
+    }
+
+    function changeMonth(delta) {
+      calendarMonth.setMonth(calendarMonth.getMonth() + delta);
+      render();
+    }
+
+    function render() {
+      const records = getRecords();
+      renderSummary(records);
+      renderList(records);
+      renderCalendar(records);
+      const { date, time } = nowParts();
+      document.getElementById('date').value = date;
+      document.getElementById('time').value = time;
+    }
+
+    render();
+  </script>
+</body>
+</html>
